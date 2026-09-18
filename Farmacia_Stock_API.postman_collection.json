@@ -1,0 +1,383 @@
+{
+	"info": {
+		"_postman_id": "9b12a874-32dc-4f88-8b9a-7c91e8470a1a",
+		"name": "Farmacia Stock API - Examen Web I",
+		"description": "Colección completa de pruebas para la API REST del Sistema de Control de Stock de Farmacia (Desarrollo de Software Web I - Sección 50).",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://127.0.0.1:8000",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "01. Requerimiento Examen: Registrar Producto (201 Created)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"codigo\": \"MED003\",\n  \"nombre\": \"Vitamina C 500 mg\",\n  \"descripcion\": \"Caja de 30 comprimidos\",\n  \"precio\": 5990,\n  \"stock_actual\": 25,\n  \"stock_minimo\": 5,\n  \"fecha_vencimiento\": \"2028-12-31\",\n  \"id_categoria\": 1,\n  \"id_proveedor\": 1\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/productos",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"productos"
+					]
+				},
+				"description": "Endpoint solicitado en la pauta oficial (Caso_Sistema.pdf). Registra un nuevo producto y retorna status 201 Created."
+			},
+			"response": []
+		},
+		{
+			"name": "02. Validación: Error Código Duplicado (422 Unprocessable)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"codigo\": \"MED001\",\n  \"nombre\": \"Paracetamol Duplicado\",\n  \"descripcion\": \"Error de código repetido\",\n  \"precio\": 2490,\n  \"stock_actual\": 10,\n  \"stock_minimo\": 5,\n  \"fecha_vencimiento\": \"2028-06-30\",\n  \"id_categoria\": 1,\n  \"id_proveedor\": 1\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/productos",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"productos"
+					]
+				},
+				"description": "Valida que el código sea único y rechaza el registro duplicado con código 422."
+			},
+			"response": []
+		},
+		{
+			"name": "03. Validación: Error Campos Obligatorios Faltantes (422)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"descripcion\": \"Solo descripción sin los campos obligatorios\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/productos",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"productos"
+					]
+				},
+				"description": "Valida la ausencia de código, nombre, precio, stock, categoría y proveedor."
+			},
+			"response": []
+		},
+		{
+			"name": "04. Consulta: Listar Todos los Productos (200 OK)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/productos",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"productos"
+					]
+				},
+				"description": "Lista el inventario completo de productos con sus relaciones de categoría y proveedor."
+			},
+			"response": []
+		},
+		{
+			"name": "05. Consulta: Productos que Necesitan Reposición (200 OK)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/productos?reposicion=1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"productos"
+					],
+					"query": [
+						{
+							"key": "reposicion",
+							"value": "1"
+						}
+					]
+				},
+				"description": "Filtra los productos cuyo stock actual sea igual o menor a su stock mínimo recomendado."
+			},
+			"response": []
+		},
+		{
+			"name": "06. Consulta: Productos Próximos a Vencer (200 OK)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/productos?proximos_vencer=1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"productos"
+					],
+					"query": [
+						{
+							"key": "proximos_vencer",
+							"value": "1"
+						}
+					]
+				},
+				"description": "Lista los medicamentos y productos que poseen fecha de vencimiento ordenada ascendentemente."
+			},
+			"response": []
+		},
+		{
+			"name": "07. Consulta: Detalle de Producto por ID (200 OK)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/productos/1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"productos",
+						"1"
+					]
+				},
+				"description": "Obtiene la ficha técnica completa de un producto por su ID."
+			},
+			"response": []
+		},
+		{
+			"name": "08. Consulta: Producto No Encontrado (404 Not Found)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/productos/9999",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"productos",
+						"9999"
+					]
+				},
+				"description": "Comprueba el manejo de recursos inexistentes con código 404."
+			},
+			"response": []
+		},
+		{
+			"name": "09. Catálogo: Listar Categorías (200 OK)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/categorias",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"categorias"
+					]
+				},
+				"description": "Lista las categorías existentes (Medicamentos, Artículos de Aseo, Bebé)."
+			},
+			"response": []
+		},
+		{
+			"name": "10. Catálogo: Listar Proveedores (200 OK)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/proveedores",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"proveedores"
+					]
+				},
+				"description": "Lista los proveedores de la farmacia."
+			},
+			"response": []
+		},
+		{
+			"name": "11. Movimientos: Registrar ENTRADA de Stock (201 Created)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id_producto\": 1,\n  \"tipo\": \"ENTRADA\",\n  \"cantidad\": 10,\n  \"observacion\": \"Reposición de mercadería de laboratorio\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/movimientos",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"movimientos"
+					]
+				},
+				"description": "Registra una entrada de inventario e incrementa atómicamente el stock del producto."
+			},
+			"response": []
+		},
+		{
+			"name": "12. Movimientos: Registrar SALIDA de Stock (201 Created)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id_producto\": 1,\n  \"tipo\": \"SALIDA\",\n  \"cantidad\": 2,\n  \"observacion\": \"Venta de producto en farmacia\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/movimientos",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"movimientos"
+					]
+				},
+				"description": "Registra una salida de inventario y descuenta el stock asegurando saldo disponible."
+			},
+			"response": []
+		},
+		{
+			"name": "13. Movimientos: Historial de Movimientos (200 OK)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/movimientos",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"movimientos"
+					]
+				},
+				"description": "Consulta el histórico cronológico de todos los movimientos de stock."
+			},
+			"response": []
+		}
+	]
+}
